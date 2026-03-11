@@ -1,0 +1,1 @@
+import{a as o}from"./api-gF5L5j2w.js";const e=t=>o.get("/product",{params:t}),p=t=>o.post("/product",t),r=(t,c)=>o.patch("/product/"+t,c),s=t=>o.delete("/product/"+t),d={getAll:e,create:p,update:r,remove:s};export{d as p};
