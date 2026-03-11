@@ -1,0 +1,1 @@
+import{a as e}from"./api-xv_2tKzc.js";const c={newCat(t){return e.post("/cat",t)},getCat(){return e.get("/cat")},getAll(){return e.get("/cat/all")},delete(t){return e.delete(`/cat/${t}`)},updateCat(t,a){return e.patch(`/cat/${t}`,a)},interact(t,a){return e.patch(`/cat/${t}/interact?type=${a}`)}};export{c};
