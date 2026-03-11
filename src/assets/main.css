@@ -1,0 +1,40 @@
+/* src/assets/main.css */
+/* @import 'pixelium-design/dist/font.css'; */
+
+:root {
+  --px-font: 'Fusion Pixel Zh_hans', sans-serif;
+  /* --- 溫馨基調 (背景與邊框) --- */
+  --theme-bg: #f9f4ef; /* 像溫暖羊毛毯的米白色 */
+  --theme-border: #2d2926; /* 帶點咖啡感的深色 */
+  --theme-white: #ffffff; /* 純白 */
+
+  /* --- 重點色 --- */
+  --theme-pink: #ffb7c5; /* 溫潤櫻花粉 */
+  --theme-pink-hover: #e699a7; /* 稍微深一點的粉 (滑鼠移上去時) */
+
+  /* --- 植物與自然 --- */
+  --theme-green-leaf: #7fb069; /* 龜背芋綠 */
+  --theme-green-dark: #4a6d41; /* 植物深綠 */
+
+  /* --- 文字顏色 --- */
+  --theme-text: #4a4a4a; /* 深灰色，比純黑更溫柔 */
+
+  --theme-border-cocoa: #4e3629; /* 復古可可色：最常用來畫像素粗邊框，或是大大的標題字 */
+  --theme-border-dark: #2d2926; /* 深焙黑咖啡：比可可色更深一點點，用在一般閱讀的小字體，保護眼睛 */
+
+  /* =========================================
+     🍵 點綴與按鈕 (讓畫面亮起來的重點色)
+     ========================================= */
+  --theme-matcha: #8f9779; /* 溫柔抹茶綠：最主要的重點色！用在「登入」、「儲存」、「確定」等主要按鈕，或是滑鼠游標摸到的變色效果 */
+  --theme-brick: #a0522d; /* 復古磚紅色：用在強調或是「登出」這種需要稍微注意的按鈕 */
+  --theme-pink: #ffb7c5; /* 溫潤櫻花粉：用在次要的按鈕，例如「取消」，或是小貓的可愛裝飾 */
+}
+
+/* 這裡可以順便寫一些全域的樣式 */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
+  font-family: 'Fusion Pixel Zh_hans', 'Press Start 2P', '微軟正黑體', cursive;
+}

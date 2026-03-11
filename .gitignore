@@ -1,0 +1,17 @@
+# 套件庫（絕對不要傳，GitHub Pages 也不需要它）
+node_modules/
+
+# 執行時產生的日誌
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 環境變數（如果有前端私密設定的話）
+.env.local
+.env.*.local
+
+# 系統雜物
+.DS_Store
+dist/
+/dist
+.vscode
