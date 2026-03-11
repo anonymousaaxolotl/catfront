@@ -1,1 +1,0 @@
-import{a as o}from"./api-xv_2tKzc.js";const e=t=>o.get("/product",{params:t}),p=t=>o.post("/product",t),r=(t,c)=>o.patch("/product/"+t,c),s=t=>o.delete("/product/"+t),d={getAll:e,create:p,update:r,remove:s};export{d as p};
