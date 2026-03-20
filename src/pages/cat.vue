@@ -1,51 +1,109 @@
 <template>
   <div class="cat-room">
     <px-container title="🐱 像素小貓的溫馨小窩">
-      <div class="roaming-area" :style="wallStyle" ref="roamingAreaRef">
-        <!-- 🌟 地板層：獨立出來，這樣牆壁跟地板才能分開換 -->
-        <div class="room-floor" :style="floorStyle"></div>
+      <div class="room-wrapper">
+        <div class="room-viewport" ref="viewportRef" :style="{ height: 750 * roomScale + 'px' }">
+          <div class="roaming-area" :style="[wallStyle, { transform: `scale(${roomScale})` }]">
+            <!-- 🌟 地板層：獨立出來，這樣牆壁跟地板才能分開換 -->
+            <div class="room-floor" :style="floorStyle"></div>
 
-        <!-- 🌟 窗戶層：如果有設定窗戶就顯示 -->
-        <div
-          v-if="currentWindow"
-          class="room-window"
-          :style="{ backgroundImage: `url(${currentWindow})` }"
-        ></div>
+            <!-- 🌟 窗戶層：如果有設定窗戶就顯示 -->
+            <div
+              v-if="currentWindow"
+              class="room-window"
+              :style="{ backgroundImage: `url(${currentWindow})` }"
+            ></div>
 
-        <!-- 🌟 時鐘層：放在窗戶右邊 -->
-        <div
-          v-if="currentClock"
-          class="room-clock"
-          :style="{ backgroundImage: `url(${currentClock})` }"
-        ></div>
+            <!-- 🌟 時鐘層：放在窗戶右邊 -->
+            <div
+              v-if="currentClock"
+              class="room-clock"
+              :style="{ backgroundImage: `url(${currentClock})` }"
+            ></div>
 
-        <!-- 🌟 貓跳台層：放在最左邊 -->
-        <div
-          v-if="currentTower"
-          class="room-tower"
-          :style="{ backgroundImage: `url(${currentTower})` }"
-        ></div>
+            <!-- 🌟 貓跳台層：放在最左邊 -->
+            <div
+              v-if="currentTower"
+              class="room-tower"
+              :style="{ backgroundImage: `url(${currentTower})` }"
+            ></div>
 
-        <!-- 🌟 植物層：放在貓跳台右邊 -->
-        <div
-          v-if="currentPlant"
-          class="room-plant"
-          :style="{ backgroundImage: `url(${currentPlant})` }"
-        ></div>
+            <!-- 🌟 植物層：放在貓跳台右邊 -->
+            <div
+              v-if="currentPlant"
+              class="room-plant"
+              :style="{ backgroundImage: `url(${currentPlant})` }"
+            ></div>
 
-        <!-- 🌟 床層：放在植物右邊 -->
-        <div
-          v-if="currentBed"
-          class="room-bed"
-          :style="{ backgroundImage: `url(${currentBed})` }"
-        ></div>
+            <!-- 🌟 床層：放在植物右邊 -->
+            <div
+              v-if="currentBed"
+              class="room-bed"
+              :style="{ backgroundImage: `url(${currentBed})` }"
+            ></div>
 
-        <!-- 🌟 書架層：放在最右邊 -->
-        <div
-          v-if="currentBookshelf"
-          class="room-bookshelf"
-          :style="{ backgroundImage: `url(${currentBookshelf})` }"
-        ></div>
+            <!-- 🌟 書架層：放在最右邊 -->
+            <div
+              v-if="currentBookshelf"
+              class="room-bookshelf"
+              :style="{ backgroundImage: `url(${currentBookshelf})` }"
+            ></div>
+
+            <div
+              v-for="item in cats"
+              :key="item._id"
+              class="cat-avatar-stage"
+              :style="{
+                left: item.x + 'px',
+                bottom: (item.y || 10) + 'px' /* 🌟 新增：綁定垂直高度 */,
+                zIndex: item._id === selectedCatId ? 9 : 1,
+                cursor: 'pointer',
+              }"
+              @click="selectCat(item)"
+            >
+              <div v-if="item.activeEffect" class="floating-effect">
+                {{ item.activeEffect }}
+              </div>
+              <div class="cat-flip-wrapper" :style="{ transform: `scaleX(${-item.dir})` }">
+                <div class="cat-window">
+                  <img
+                    :src="
+                      item.isMoving
+                        ? getCatConfig(item.skin).walkUrl
+                        : getCatConfig(item.skin).idleUrl
+                    "
+                    class="cat-sheet"
+                    :class="{
+                      'cat-mutated': item.form === 'mutated',
+                      'cat-dirty': item.form === 'dirty',
+                    }"
+                    :style="{
+                      transform: isBreathing
+                        ? `translateX(${getCatConfig(item.skin).offset})`
+                        : 'translateX(0px)',
+                    }"
+                    alt="小貓的像素化身"
+                  />
+                </div>
+
+                <div class="pixel-shadow"></div>
+                <!-- 🌟 選中指示器 -->
+                <div v-if="item._id === selectedCatId" class="selection-arrow">▼</div>
+                <!-- 🌟 狀態 Emoji 特效 -->
+                <div class="status-emoji-container">
+                  <div
+                    v-for="(emoji, index) in getStatusEmojis(item)"
+                    :key="index"
+                    class="status-emoji"
+                    :style="getEmojiStyle(index)"
+                  >
+                    {{ emoji }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="cat-hud">
           <div class="hud-name">
@@ -84,58 +142,6 @@
 
             <div class="hud-exp">
               ✨ EXP: {{ currentCat.experience }} / {{ currentCat.level * 100 }}
-            </div>
-          </div>
-        </div>
-
-        <div
-          v-for="item in cats"
-          :key="item._id"
-          class="cat-avatar-stage"
-          :style="{
-            left: item.x + 'px',
-            bottom: (item.y || 10) + 'px' /* 🌟 新增：綁定垂直高度 */,
-            zIndex: item._id === selectedCatId ? 9 : 1,
-            cursor: 'pointer',
-          }"
-          @click="selectCat(item)"
-        >
-          <div v-if="item.activeEffect" class="floating-effect">
-            {{ item.activeEffect }}
-          </div>
-          <div class="cat-flip-wrapper" :style="{ transform: `scaleX(${-item.dir})` }">
-            <div class="cat-window">
-              <img
-                :src="
-                  item.isMoving ? getCatConfig(item.skin).walkUrl : getCatConfig(item.skin).idleUrl
-                "
-                class="cat-sheet"
-                :class="{
-                  'cat-mutated': item.form === 'mutated',
-                  'cat-dirty': item.form === 'dirty',
-                }"
-                :style="{
-                  transform: isBreathing
-                    ? `translateX(${getCatConfig(item.skin).offset})`
-                    : 'translateX(0px)',
-                }"
-                alt="小貓的像素化身"
-              />
-            </div>
-
-            <div class="pixel-shadow"></div>
-            <!-- 🌟 選中指示器 -->
-            <div v-if="item._id === selectedCatId" class="selection-arrow">▼</div>
-            <!-- 🌟 狀態 Emoji 特效 -->
-            <div class="status-emoji-container">
-              <div
-                v-for="(emoji, index) in getStatusEmojis(item)"
-                :key="index"
-                class="status-emoji"
-                :style="getEmojiStyle(index)"
-              >
-                {{ emoji }}
-              </div>
             </div>
           </div>
         </div>
@@ -232,15 +238,21 @@ const currentCat = computed(() => {
 const isBreathing = ref(false)
 let breatheTimer = null
 
-// 🌟 魔法二：左右移動的節拍器 (加上方向與大腦)
-const roamingAreaRef = ref(null)
-const roomWidth = ref(window.innerWidth || 800)
+// 🌟 縮放計算與移動大腦
+const viewportRef = ref(null)
+const viewportWidth = ref(window.innerWidth || 1440)
+const roomScale = computed(() => {
+  return viewportWidth.value < 1440 ? viewportWidth.value / 1440 : 1
+})
+const roomWidth = ref(1440) // 🌟 內部邏輯永遠固定 1440
 let moveTimer = null
 let aiTimer = null
 
 const updateRoomWidth = () => {
-  if (roamingAreaRef.value) {
-    roomWidth.value = roamingAreaRef.value.clientWidth
+  if (viewportRef.value) {
+    viewportWidth.value = viewportRef.value.clientWidth
+  } else {
+    viewportWidth.value = window.innerWidth
   }
 }
 
@@ -626,14 +638,30 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 🌟 阿布新蓋的散步區：把小貓限制在這個框框裡 */
-.roaming-area {
+/* 🌟 用來包住房間與狀態欄，讓狀態欄能正常定位 */
+.room-wrapper {
   position: relative;
-  height: 750px; /* 🌟 放大活動空間 */
+  margin-bottom: 20px;
+}
+
+/* 🌟 外層容器，用來定位 HUD 不受捲軸影響 */
+.room-viewport {
+  position: relative;
   width: 100%;
+  overflow: hidden; /* 🌟 隱藏超出範圍的縮放內容 */
+}
+
+/* 🌟 散步區：把小貓限制在這個框框裡 */
+.roaming-area {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -720px; /* 🌟 永遠保持置中 (1440的一半) */
+  height: 750px; /* 🌟 放大活動空間 */
+  width: 1440px; /* 🌟 內部固定 1440px */
+  transform-origin: center top; /* 🌟 從上方中間開始等比例縮放 */
   overflow: hidden; /* 防止貓咪跑出螢幕 */
   border-bottom: 4px solid #000;
-  margin-bottom: 20px;
   background-color: #fcfcfc;
   /* 🌟 牆壁樣式 (背景) */
   background-repeat: repeat; /* 牆壁通常是整面平鋪 */
@@ -777,7 +805,7 @@ onUnmounted(() => {
 /* 🌟 新增：HUD 狀態欄樣式 (取代原本的名字牌) */
 .cat-hud {
   position: absolute;
-  bottom: 16px; /* 🌟 改到右下角 */
+  bottom: 24px; /* 🌟 提高一點避免擋到可能出現的捲軸 */
   right: 16px;
   z-index: 10;
   background: rgba(255, 255, 255, 0.9);
@@ -828,7 +856,6 @@ onUnmounted(() => {
 /* 🌟 終極自由的 8-bit 影子 */
 .pixel-shadow {
   position: absolute;
-  /* 🎮 阿布魔法搖桿：現在可以用負數了！大膽地把它推到貓咪腳底！ */
   bottom: -8px;
   left: 115px;
   width: 140px;
@@ -852,9 +879,12 @@ onUnmounted(() => {
 .action-grid {
   display: flex;
   justify-content: center;
+  width: 100%;
+  overflow-x: auto; /* 🌟 讓長條按鈕在窄螢幕上可以左右滑動 */
+  padding-bottom: 8px; /* 留點空間給捲軸 */
 }
 
-/* 🌟 阿布特調的：漂浮泡泡特效 */
+/* 🌟 漂浮泡泡特效 */
 .floating-effect {
   position: absolute;
   top: 0px; /* 從小貓的頭頂開始飄 */
@@ -1029,5 +1059,21 @@ onUnmounted(() => {
   text-align: center;
   padding: 20px;
   color: #888;
+}
+
+/* 📱 響應式魔法：手機尺寸時把狀態欄排到下面 */
+@media (max-width: 768px) {
+  .cat-hud {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .action-grid {
+    margin-bottom: 24px; /* 🌟 增加手機版底部的留白，讓按鈕不會太貼邊界 */
+  }
 }
 </style>
