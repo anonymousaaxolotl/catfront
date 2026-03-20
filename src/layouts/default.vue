@@ -10,7 +10,9 @@
         >
           {{ isMobileMenuOpen ? 'close' : 'menu' }}
         </span>
-        <div class="logo"><span class="eng-pixel">PIXELCOZY</span> 小貓俱樂部</div>
+        <router-link to="/" class="logo"
+          ><span class="eng-pixel">PIXELCOZY</span> 小貓俱樂部</router-link
+        >
       </div>
 
       <div class="navbar-right-group">
@@ -56,7 +58,9 @@
         <span class="material-symbols-outlined icon-large mobile-menu-btn" @click="closeMobileMenu"
           >close</span
         >
-        <div class="logo"><span class="eng-pixel">PIXELCOZY</span> 小貓俱樂部</div>
+        <router-link to="/" class="logo" @click="closeMobileMenu">
+          <span class="eng-pixel">PIXELCOZY</span> 小貓俱樂部
+        </router-link>
       </div>
       <nav class="drawer-nav">
         <router-link class="drawer-link" to="/" @click="closeMobileMenu"
@@ -192,6 +196,14 @@ const logout = () => {
   font-size: 1.2rem;
   color: #4e3629;
   white-space: nowrap; /* 🌟 確保 Logo 也不會被折斷 */
+  text-decoration: none; /* 🌟 移除超連結的預設底線 */
+  transition: all 0.2s ease;
+  display: inline-block; /* 🌟 確保位移動畫能正常生效 */
+}
+
+.logo:hover {
+  color: #8f9779; /* 🌟 變成抹茶綠 */
+  transform: translateY(-2px); /* 🌟 微微往上彈跳的互動感 */
 }
 
 .navbar-right-group {
@@ -372,6 +384,16 @@ const logout = () => {
 
 .made-with-love {
   opacity: 0.7;
+}
+
+/* 💻 平板橫放 / 筆電尺寸：隱藏導覽列的英文字並稍微縮小間距，避免擁擠 */
+@media (max-width: 1280px) {
+  .nav-link .eng-pixel {
+    display: none; /* 隱藏英文 */
+  }
+  .navbar-nav {
+    gap: 16px; /* 把間距從原本的 24px 稍微縮小 */
+  }
 }
 
 @media (max-width: 1024px) {
